@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PacketGroup Name="NetSoakTestPackets" PacketStart="CorePackets::PacketType::MAX">
+    <Include File="AzNetworking/AutoGen/CorePackets.AutoPackets.h" />
+    <Include File="NetSoakTestTypes.h" />
+    
+    <Packet Name="Small" Desc="2 byte payload packet">
+        <Member Type="uint16_t" Name="smallDatum" Init="0" />
+    </Packet>
+
+    <Packet Name="Large" Desc="Large packet to test fragmenting">
+        <Member Type="NetSoakTest::TestNetworkBuffer" Name="largeDatum"/>
+    </Packet>
+</PacketGroup>

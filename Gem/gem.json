@@ -1,0 +1,10 @@
+{
+    "GemFormatVersion": 4,
+    "Uuid": "5111dee500ed4812a7905093a73d3837",
+    "Name": "NetSoakTest",
+    "DisplayName": "NetSoakTest",
+    "Summary": "NetSoakTest Project Gem. Indefinitely tests AzNetworking transport via loopback.",
+    "Tags": ["Game"],
+    "IconPath": "preview.png",
+    "IsGameGem": true
+}
