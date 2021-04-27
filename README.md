@@ -1,4 +1,4 @@
-# Atom StarterGame Project - Project Spectra Private Preview 
+# NetSoakTest Project - Project Spectra Private Preview 
 
 ## Confidentiality; Pre-Release Access  
 
