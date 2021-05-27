@@ -16,8 +16,7 @@ set(GEM_DEPENDENCIES
     Gem::LyShine.Editor
     Gem::Maestro.Editor
     Gem::SceneProcessing.Editor
-    Gem::ImageProcessing.Editor
     Gem::LmbrCentral.Editor
-    Gem::TextureAtlas
+    Gem::TextureAtlas.Editor
     Gem::Camera.Editor
 )
