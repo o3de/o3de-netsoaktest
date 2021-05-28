@@ -10,6 +10,7 @@
 #
 
 set(GEM_DEPENDENCIES
+    Gem::Atom_AtomBridge
     Gem::NetSoakTest
     Gem::Multiplayer
 )
