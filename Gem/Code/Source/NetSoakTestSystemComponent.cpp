@@ -18,6 +18,16 @@
 
 #include "NetSoakTestSystemComponent.h"
 
+namespace AzNetworking
+{
+    enum class SoakMode
+    {
+        Loopback,
+        Client,
+        Host
+    };
+}
+
 namespace AZ::ConsoleTypeHelpers
 {
     template <>
@@ -44,6 +54,40 @@ namespace AZ::ConsoleTypeHelpers
         }
         return false;
     }
+
+    template <>
+    inline CVarFixedString ValueToString(const AzNetworking::SoakMode& value)
+    {
+        if (value == AzNetworking::SoakMode::Client)
+        {
+            return "client";
+        }
+        if (value == AzNetworking::SoakMode::Host)
+        {
+            return "host";
+        }
+        return "loopback";
+    }
+
+    template <>
+    inline bool StringSetToValue<AzNetworking::SoakMode>(AzNetworking::SoakMode& outValue, const ConsoleCommandContainer& arguments)
+    {
+        if (!arguments.empty())
+        {
+            if (arguments.front() == "client")
+            {
+                outValue = AzNetworking::SoakMode::Client;
+                return true;
+            }
+            else if (arguments.front() == "host")
+            {
+                outValue = AzNetworking::SoakMode::Host;
+                return true;
+            }
+        }
+        outValue = AzNetworking::SoakMode::Loopback;
+        return true;
+    }
 }
 
 namespace NetSoakTest
@@ -56,8 +100,10 @@ namespace NetSoakTest
     AZ_CVAR(AZ::TimeMs, soak_latencyms, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality latency");
     AZ_CVAR(AZ::TimeMs, soak_variancems, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
     AZ_CVAR(uint16_t, soak_losspercentage, 0, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality packet drop rate");
+    AZ_CVAR(AZ::CVarFixedString, soak_serveraddr, AZ::CVarFixedString("127.0.0.1"), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The address of the server or host to connect to");
     AZ_CVAR(uint16_t, soak_port, 30090, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
+    AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -107,10 +153,17 @@ namespace NetSoakTest
         m_networkInterface = AZ::Interface<INetworking>::Get()->CreateNetworkInterface(AZ::Name(s_networkInterfaceName), soak_protocol, TrustZone::ExternalClientToServer, *this);
         m_loopbackInterface = AZ::Interface<INetworking>::Get()->CreateNetworkInterface(AZ::Name(s_loopbackInterfaceName), soak_protocol, TrustZone::ExternalClientToServer, *this);
 
-        m_networkInterface->Listen(soak_port);
-        constexpr AZ::CVarFixedString localAddress = "127.0.0.1";
-        const IpAddress ipAddress(localAddress.c_str(), soak_port, m_loopbackInterface->GetType());
-        m_loopbackInterface->Connect(ipAddress);
+        if (soak_mode == SoakMode::Loopback || soak_mode == SoakMode::Host)
+        {
+            m_networkInterface->Listen(soak_port);
+        }
+
+        if (soak_mode == SoakMode::Loopback || soak_mode == SoakMode::Client)
+        {
+            const AZ::CVarFixedString localAddress = soak_mode == SoakMode::Loopback ? AZ::CVarFixedString("127.0.0.1") : soak_serveraddr;
+            const IpAddress ipAddress(localAddress.c_str(), soak_port, m_loopbackInterface->GetType());
+            m_loopbackInterface->Connect(ipAddress);
+        }
 
         NetSoakTestRequestBus::Handler::BusConnect();
         AZ::TickBus::Handler::BusConnect();
