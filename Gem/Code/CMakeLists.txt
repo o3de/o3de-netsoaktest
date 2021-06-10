@@ -74,3 +74,17 @@ if(PAL_TRAIT_BUILD_SERVER_SUPPORTED)
     
     set_property(GLOBAL APPEND PROPERTY LY_LAUNCHER_SERVER_PROJECTS NetSoakTest)
 endif()
+
+if (PAL_TRAIT_BUILD_HOST_TOOLS)
+    # The Editor uses "Tools" gem variants:
+    ly_enable_gems(
+        PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+        TARGETS Editor
+        VARIANTS Tools)
+
+    # The pipeline tools use "Builders" gem variants:
+    ly_enable_gems(
+        PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+        TARGETS AssetBuilder AssetProcessor AssetProcessorBatch
+        VARIANTS Builders)
+endif()
