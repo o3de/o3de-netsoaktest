@@ -96,7 +96,7 @@ namespace NetSoakTest
     AZ_CVAR(AZ::TimeMs, soak_variancems, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
     AZ_CVAR(uint16_t, soak_losspercentage, 0, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality packet drop rate");
     AZ_CVAR(AZ::CVarFixedString, soak_serveraddr, AZ::CVarFixedString("127.0.0.1"), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The address of the server or host to connect to");
-    AZ_CVAR(uint16_t, soak_port, 30090, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
+    AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
 

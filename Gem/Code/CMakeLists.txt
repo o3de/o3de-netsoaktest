@@ -36,7 +36,6 @@ ly_add_target(
 ly_add_target(
     NAME NetSoakTest ${PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE}
     NAMESPACE Gem
-    OUTPUT_NAME Gem.NetSoakTest.5111dee500ed4812a7905093a73d3837.v0.1.0
     FILES_CMAKE
         netsoaktest_shared_files.cmake
     INCLUDE_DIRECTORIES
@@ -49,48 +48,39 @@ ly_add_target(
             Gem::NetSoakTest.Static
 )
 
+# if enabled, NetSoakTest is used by all kinds of applications
+ly_create_alias(NAME NetSoakTest.Clients  NAMESPACE Gem TARGETS Gem::NetSoakTest)
+ly_create_alias(NAME NetSoakTest.Servers  NAMESPACE Gem TARGETS Gem::NetSoakTest)
+
 ################################################################################
 # Gem dependencies
 ################################################################################
 
-if(PAL_TRAIT_BUILD_HOST_TOOLS)
-    ly_add_project_dependencies(
-        PROJECT_NAME
-            NetSoakTest
-        TARGETS
-            AssetBuilder
-            AssetProcessor
-            AssetProcessorBatch
-            Editor
-        DEPENDENCIES_FILES
-            tool_dependencies.cmake
-    )
+# The GameLauncher uses "Clients" gem variants:
+ly_enable_gems(PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+    TARGETS NetSoakTest.GameLauncher
+    VARIANTS Clients)
+
+# If we build a server, then apply the gems to the server
+if(PAL_TRAIT_BUILD_SERVER_SUPPORTED)
+    # if we're making a server, then add the "Server" gem variants to it:
+    ly_enable_gems(PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+        TARGETS NetSoakTest.ServerLauncher
+        VARIANTS Servers)
+    
+    set_property(GLOBAL APPEND PROPERTY LY_LAUNCHER_SERVER_PROJECTS NetSoakTest)
 endif()
 
-if(PAL_TRAIT_BUILD_SERVER_SUPPORTED)
-    ly_add_target(
-        NAME NetSoakTest.Server ${PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE}
-        NAMESPACE Gem
-        OUTPUT_NAME Gem.NetSoakTest.Server.5111dee500ed4812a7905093a73d3837.v0.1.0
-        FILES_CMAKE
-            netsoaktest_shared_files.cmake
-        INCLUDE_DIRECTORIES
-            PRIVATE
-                Source
-                .
-        BUILD_DEPENDENCIES
-            PRIVATE
-                Gem::NetSoakTest.Static
-    )
+if (PAL_TRAIT_BUILD_HOST_TOOLS)
+    # The Editor uses "Tools" gem variants:
+    ly_enable_gems(
+        PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+        TARGETS Editor
+        VARIANTS Tools)
 
-    ly_add_project_dependencies(
-        PROJECT_NAME
-            NetSoakTest
-        TARGETS
-            NetSoakTest.ServerLauncher
-        DEPENDENCIES_FILES
-            runtime_dependencies.cmake
-    )
-    set_property(GLOBAL APPEND PROPERTY LY_LAUNCHER_SERVER_PROJECTS NetSoakTest)
-
+    # The pipeline tools use "Builders" gem variants:
+    ly_enable_gems(
+        PROJECT_NAME NetSoakTest GEM_FILE enabled_gems.cmake
+        TARGETS AssetBuilder AssetProcessor AssetProcessorBatch
+        VARIANTS Builders)
 endif()
