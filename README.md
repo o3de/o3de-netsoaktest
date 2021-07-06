@@ -1,8 +1,4 @@
-# NetSoakTest Project - Project Spectra Private Preview 
-
-## Confidentiality; Pre-Release Access  
-
-Welcome to the Project Spectra Private Preview.  This is a confidential pre-release project; your use is subject to the nondisclosure agreement between you (or your organization) and Amazon.  Do not disclose the existence of this project, your participation in it, or any of the  materials provided, to any unauthorized third party.  To request access for a third party, please contact [Royal O'Brien, obriroya@amazon.com](mailto:obriroya@amazon.com).
+# NetSoakTest Project 
 
 ## Download and Install
 
@@ -33,7 +29,7 @@ This option lets you keep engine and project files in separate locations.
 
 ```shell
 # clone the project into a folder outside your engine repository folder
-> git clone https://github.com/aws-lumberyard-dev/o3de-netsoaktest.git
+> git clone https://github.com/o3de/o3de-netsoaktest.git
 Cloning into 'o3de-netsoaktest'...
 
 # register the engine
@@ -56,7 +52,7 @@ If you use this approach you must also modify your engine's local git exclude fi
 
 ```shell
 # clone the project in a folder named 'NetSoakTest' in your existing engine repository folder
-> git clone https://github.com/aws-lumberyard-dev/o3de-netsoaktest.git C:/path/to/engine/NetSoakTest
+> git clone https://github.com/o3de/o3de-netsoaktest.git C:/path/to/engine/NetSoakTest
 Cloning into 'NetSoakTest'...
 
 # modify the local engine git exclude file to ignore the project folder
