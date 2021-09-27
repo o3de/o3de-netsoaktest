@@ -209,6 +209,11 @@ namespace NetSoakTest
         return AZ::TICK_PLACEMENT + 2;
     }
 
+    bool NetSoakTestSystemComponent::IsHandshakeComplete() const
+    {
+        return true;
+    }
+
     bool NetSoakTestSystemComponent::HandleRequest([[maybe_unused]] IConnection* connection,
         [[maybe_unused]] const IPacketHeader& packetHeader, [[maybe_unused]] const NetSoakTestPackets::Small& packet)
     {
@@ -229,11 +234,10 @@ namespace NetSoakTest
 
     void NetSoakTestSystemComponent::OnConnect(IConnection* connection)
     {
-        ConnectionQuality testQuality;
+        ConnectionQuality& testQuality = connection->GetConnectionQuality();
         testQuality.m_latencyMs = soak_latencyms;
         testQuality.m_lossPercentage = soak_losspercentage;
         testQuality.m_varianceMs = soak_variancems;
-        connection->SetConnectionQuality(testQuality);
 
         if (connection->GetConnectionRole() == ConnectionRole::Connector)
         {
@@ -245,7 +249,7 @@ namespace NetSoakTest
         }
     }
 
-    bool NetSoakTestSystemComponent::OnPacketReceived([[maybe_unused]] IConnection* connection, [[maybe_unused]] const IPacketHeader& packetHeader, [[maybe_unused]] ISerializer& serializer)
+    PacketDispatchResult NetSoakTestSystemComponent::OnPacketReceived(IConnection* connection, const IPacketHeader& packetHeader, ISerializer& serializer)
     {
         return NetSoakTestPackets::DispatchPacket(connection, packetHeader, serializer, *this);
     }
