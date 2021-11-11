@@ -74,5 +74,7 @@ namespace NetSoakTest
     private:
         AzNetworking::INetworkInterface* m_networkInterface = nullptr;
         AzNetworking::INetworkInterface* m_loopbackInterface = nullptr;
+
+        AZ::TimeMs totalElapsedMs = AZ::TimeMs(0);
     };
 }

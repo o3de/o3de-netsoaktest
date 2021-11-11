@@ -174,7 +174,14 @@ namespace NetSoakTest
 
     void NetSoakTestSystemComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
-        [[maybe_unused]] AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+        AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+
+        total_elapsedMs += elapsedMs;
+        if (soak_runtime != AZ::TimeMs(0) && total_elapsedMs > soak_runtime)
+        {
+            DumpSoakStats();
+            exit(0);
+        }
 
         NetSoakTestPackets::Small packet;
 
@@ -270,9 +277,6 @@ namespace NetSoakTest
         AZStd::vector<INetworkInterface*> networkInterfaces;
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_networkInterfaceName)));
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_loopbackInterfaceName)));
-
-        // Allows for a desired runtime before dumping out stats
-        AZStd::this_thread::sleep_for(AZStd::chrono::milliseconds(soak_runtime))
 
         for (auto& networkInterface : networkInterfaces)
         {
