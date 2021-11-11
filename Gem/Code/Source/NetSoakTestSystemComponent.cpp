@@ -100,6 +100,7 @@ namespace NetSoakTest
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
+    AZ_CVAR(SoakMode, soak_runtime, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run the soak test for before dumping stats");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -269,6 +270,9 @@ namespace NetSoakTest
         AZStd::vector<INetworkInterface*> networkInterfaces;
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_networkInterfaceName)));
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_loopbackInterfaceName)));
+
+        // Allows for a desired runtime before dumping out stats
+        AZStd::this_thread::sleep_for(AZStd::chrono::milliseconds(soak_runtime))
 
         for (auto& networkInterface : networkInterfaces)
         {

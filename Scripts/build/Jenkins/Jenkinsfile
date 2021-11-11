@@ -378,6 +378,13 @@ def Build(Map pipelineConfig, String platform, String type, String workspace) {
         dir("${workspace}/${ENGINE_REPOSITORY_NAME}") {
             PlatformSh(command, "Running ${platform} ${type}")
         }
+
+        // Launch the project, which automatically starts the tests
+        launch_command += "NetSoakTest.ServerLauncher --soak_runtime=1800000 --soak_mode=loopback --rhi=null"
+        dir("${workspace}/${ENGINE_REPOSITORY_NAME}") {
+            PlatformSh(launch_command, "Running NetSoakTest project")
+        }
+
     }
 }
 
