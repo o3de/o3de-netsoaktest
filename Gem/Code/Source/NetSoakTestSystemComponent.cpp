@@ -100,7 +100,7 @@ namespace NetSoakTest
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
-    AZ_CVAR(SoakMode, soak_runtime, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run the soak test for before dumping stats");
+    AZ_CVAR(AZ::TimeMs, soak_runtime, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run the soak test for before dumping stats");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -176,7 +176,7 @@ namespace NetSoakTest
     {
         AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
 
-        total_elapsedMs += elapsedMs;
+        m_totalElapsedMs += elapsedMs;
         if (soak_runtime != AZ::TimeMs(0) && total_elapsedMs > soak_runtime)
         {
             DumpSoakStats();
