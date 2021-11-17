@@ -177,7 +177,7 @@ namespace NetSoakTest
         AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
 
         m_totalElapsedMs += elapsedMs;
-        if (soak_runtime != AZ::TimeMs(0) && total_elapsedMs > soak_runtime)
+        if (soak_runtime != AZ::TimeMs(0) && m_totalElapsedMs > soak_runtime)
         {
             DumpSoakStats();
             exit(0);
