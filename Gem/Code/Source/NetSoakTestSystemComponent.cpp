@@ -179,6 +179,9 @@ namespace NetSoakTest
         m_totalElapsedMs += elapsedMs;
         if (soak_runtime != AZ::TimeMs(0) && m_totalElapsedMs > soak_runtime)
         {
+            const AZ::CVarFixedString dumpSoakStatsStrings = "DumpSoakStats";
+            const auto console = AZ::Interface<AZ::IConsole>::Get();
+            console->PerformCommand(dumpSoakStatsStrings.c_str());
             DumpSoakStats();
             exit(0);
         }
