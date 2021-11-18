@@ -182,7 +182,6 @@ namespace NetSoakTest
             const AZ::CVarFixedString dumpSoakStatsStrings = "DumpSoakStats";
             const auto console = AZ::Interface<AZ::IConsole>::Get();
             console->PerformCommand(dumpSoakStatsStrings.c_str());
-            DumpSoakStats();
             exit(0);
         }
 
