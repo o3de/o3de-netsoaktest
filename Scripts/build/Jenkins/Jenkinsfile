@@ -377,17 +377,16 @@ def Build(Map pipelineConfig, String platform, String type, String workspace) {
         command += " -u ${pipelineConfig.BUILD_ENTRY_POINT} --platform ${platform} --type ${type}"
         dir("${workspace}/${ENGINE_REPOSITORY_NAME}") {
             PlatformSh(command, "Running ${platform} ${type}")
-        }
 
-        // Only launch NetSoakTest on the appropriate platforms
-        if (platform == 'Windows') {
-            // Launch the project, which automatically starts the tests
-            launch_command = "NetSoakTest.ServerLauncher.exe --soak_runtime=1800000 --soak_mode=loopback --rhi=null"
-            dir("${workspace}/${ENGINE_REPOSITORY_NAME}") {
-                PlatformSh("build/bin/profile/${launch_command}", "Running NetSoakTest project")
+            // Only launch NetSoakTest on the appropriate platforms
+            if (platform == 'Windows' && type != 'validation') {
+                // Launch the project, which automatically starts the tests
+                launch_command = "NetSoakTest.ServerLauncher.exe --soak_runtime=1800000 --soak_mode=loopback --rhi=null"
+                dir("${workspace}/${ENGINE_REPOSITORY_NAME}") {
+                    PlatformSh("build/windows/bin/${type}/${launch_command}", "Running NetSoakTest project")
+                }
             }
         }
-
     }
 }
 
