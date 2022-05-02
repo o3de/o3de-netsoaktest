@@ -169,6 +169,9 @@ namespace NetSoakTest
     {
         AZ::TickBus::Handler::BusDisconnect();
         NetSoakTestRequestBus::Handler::BusDisconnect();
+
+        AZ::Interface<INetworking>::Get()->DestroyNetworkInterface(AZ::Name(s_loopbackInterfaceName));
+        AZ::Interface<INetworking>::Get()->DestroyNetworkInterface(AZ::Name(s_networkInterfaceName));
     }
 
     void NetSoakTestSystemComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
