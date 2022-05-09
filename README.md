@@ -1,5 +1,8 @@
 # NetSoakTest Project 
 
+## Overview
+NetSoakTest is an O3DE sample project used to stress test the AzNetworking transport layer. It is a headless server application that presently runs two connections locally via a loopback mechanism in which each endpoint sends a variety of packets to the other.
+
 ## Download and Install
 
 This repository uses Git LFS for storing large binary files.  You will need to create a Github personal access token to authenticate with the LFS service.
@@ -27,13 +30,14 @@ There are two options when installing a project
 
 This option lets you keep engine and project files in separate locations.
 
+##### Windows
 ```shell
 # clone the project into a folder outside your engine repository folder
 > git clone https://github.com/o3de/o3de-netsoaktest.git
 Cloning into 'o3de-netsoaktest'...
 
 # register the engine
-> C:/Path/To/o3de/scripts/o3de.bat register --this-engine
+> C:/Path/To/o3de/scripts/o3de.bat register --this-engine 
 
 # register the project 
 > C:/Path/To/o3de/scripts/o3de.bat register -p C:/Path/To/o3de-netsoaktest
@@ -42,8 +46,28 @@ Cloning into 'o3de-netsoaktest'...
 > cmake -S C:/Path/To/o3de-netsoaktest -b C:/Path/To/o3de-netsoaktest/build -G "Visual Studio 16 2019" -DLY_3RDPARTY_PATH="C:/3rdparty"
 
 # example build command
-> cmake --build C:/Path/To/o3de-netsoaktest/build --target Editor NetSoakTest.GameLauncher --configure profile -- /m /nologo 
+> cmake --build C:/Path/To/o3de-netsoaktest/build --target Editor NetSoakTest.ServerLauncher --configure profile -- /m /nologo 
 ```
+
+##### Linux
+```shell
+# clone the project into a folder outside your engine repository folder
+> git clone https://github.com/o3de/o3de-netsoaktest.git
+Cloning into 'o3de-netsoaktest'...
+
+# register the engine
+>/path/to/o3de/scripts/o3de.bat register --this-engine 
+
+# register the project 
+> /path/to/o3de/scripts/o3de.sh register -p /path/to/o3de-netsoaktest
+
+# example configure command
+> cmake -S /pathto/o3de-netsoaktest -b /path/to/o3de-netsoaktest/build -G "Ninja Multi-Config" -DLY_3RDPARTY_PATH="C:/3rdparty" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 
+
+# example build command
+> cmake --build /path/to/o3de-netsoaktest/build --config profile --target Editor NetSoakTest.ServerLauncher
+```
+
 
 #### Option #2 - Engine-centric approach to building a project 
 
@@ -64,12 +88,42 @@ Cloning into 'NetSoakTest'...
 > cmake -S C:/Path/To/o3de -b C:/Path/To/o3de/build -G "Visual Studio 16 2019" -DLY_3RDPARTY_PATH="C:/3rdparty" -DLY_PROJECTS=NetSoakTest 
 
 # example build command
-> cmake --build C:/Path/To/o3de/build --target Editor NetSoakTest.GameLauncher --configure profile -- /m /nologo 
+> cmake --build C:/Path/To/o3de/build --target Editor NetSoakTest.ServerLauncher --configure profile -- /m /nologo 
 
 ```
 
 If you have a Git credential helper configured, you should not be prompted for your credentials anymore.
 
+## Running the Project
+
+Run the netsoak ServerLauncher with the relevant options (see below). It is strongly recommended to use --rhi=null when launching NetSoakTest.ServerLauncher
+
+To pass command line values when launching the executable the format is ```--<command>=<value>```
+
+``` 
+NetSoakTest.ServerLauncher --soak_mode=loopback --rhi=null 
+```
+
+Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTest does not utilize its GameLauncher by design.
+
+### Options
+
+
+| Cvar | Description | Default |
+|-------|------------|---------|
+| soak_latencyms | Simulated connection quality latency in milliseconds | 0 | 
+| soak_variancems | Simulated connection quality variance in milliseconds | 0 | 
+| soak_losspercentage | Simulated connection quality packet drop rate | 0 |
+| soak_serveraddr | The address for a client soak test to connect to, localhost by default (only used in Client Soak Mode) | 127.0.0.1 |
+| soak_port | The port that this soak test will bind to for game traffic | 33450 |
+| soak_protocol | Soak test protocol (TCP or UDP) | udp | 
+| soak_mode | The operating mode for the soak test, options are loopback, client or host. `Loopback` has two connection within the application feed traffic to each other in a loop. `Client` expects to connect to a server hosted at soak_serveraddr. `Host` hosts a server for clients to connect to | Loopback | 
+
+Other networking features such as Compression or DTLS/TLS can be enabled/disabled in the same way they would be in a production environment. For example:
+
+```
+NetSoakTest.ServerLauncher --net_UdpUseEncryption=true
+```
 
 ## License
 
