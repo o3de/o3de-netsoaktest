@@ -24,7 +24,7 @@ namespace NetSoakTest
         constexpr char hexchar[] = "0123456789ABCDEF";
 
         TestNetworkBuffer rBuffer;
-        for (int i = 0; i < TestSize; ++i)
+        for (size_t i = 0; i < TestSize; ++i)
         {
             rBuffer.append(1, hexchar[i % (sizeof(hexchar) - 1)]);
         }
