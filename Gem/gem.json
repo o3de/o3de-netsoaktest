@@ -1,10 +1,21 @@
 {
-    "GemFormatVersion": 4,
-    "Uuid": "5111dee500ed4812a7905093a73d3837",
-    "Name": "NetSoakTest",
-    "DisplayName": "NetSoakTest",
-    "Summary": "NetSoakTest Project Gem. Indefinitely tests AzNetworking transport via loopback.",
-    "Tags": ["Game"],
-    "IconPath": "preview.png",
-    "IsGameGem": true
+    "gem_name": "NetSoakTest",
+    "display_name": "NetSoakTest",
+    "licence": "Apache-2.0 or MIT",
+    "license_url": "https://github.com/o3de/o3de-netsoaktest/blob/development/LICENSE.txt",
+    "origin": "",
+    "origin_url": "https://github.com/o3de/o3de-netsoaktest",
+    "type": "",
+    "summary": "NetSoakTest Project Gem. Indefinitely tests AzNetworking transport via loopback.",
+    "canonical_tags": [
+        "Gem"
+    ],
+    "user_tags": [
+        "NetSoakTest"
+    ],
+    "icon_path": "preview.png",
+    "requirements": "",
+    "documentation_url": "",
+    "dependencies": [
+    ]
 }
