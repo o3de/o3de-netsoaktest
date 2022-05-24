@@ -96,15 +96,13 @@ If you have a Git credential helper configured, you should not be prompted for y
 
 ## Running the Project
 
-Run the netsoak ServerLauncher with the relevant options (see below). It is strongly recommended to use --rhi=null when launching NetSoakTest.ServerLauncher when running test. 
-
-To pass command line values when launching the executable the format is ```--<command>=<value>```
+Run the netsoak ServerLauncher with the relevant comand line values (see full options below), using the format is ```--<command>=<value>```
 
 ``` 
-NetSoakTest.ServerLauncher --soak_mode=loopback --rhi=null 
+NetSoakTest.ServerLauncher --soak_mode=loopback 
 ```
 
-For experimentation with project, do not disable rhi so you can access the [debug console](https://www.o3de.org/docs/user-guide/appendix/cvars/debugging/#using-console-debug-views). The `DumpSoakStats` command can be used in the debug console to see point-in-time stats.
+When running tests, you can use the [debug console](https://www.o3de.org/docs/user-guide/appendix/cvars/debugging/#using-console-debug-views) and the `DumpSoakStats` command to see point-in-time stats from the test. The test will run indefinitely until such point it is terminated.
 
 Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTest does not utilize its GameLauncher by design.
 
