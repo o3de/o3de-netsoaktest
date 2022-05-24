@@ -93,8 +93,8 @@ namespace NetSoakTest
     static const AZStd::string_view s_networkInterfaceName("NetSoakNetworkInterface");
     static const AZStd::string_view s_loopbackInterfaceName("NetSoakLoopbackInterface");
 
-    AZ_CVAR(AZ::TimeMs, soak_latencyms, static_cast<AZ::TimeMs>(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality latency");
-    AZ_CVAR(AZ::TimeMs, soak_variancems, static_cast<AZ::TimeMs>(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
+    AZ_CVAR(AZ::TimeMs, soak_latencyms, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality latency");
+    AZ_CVAR(AZ::TimeMs, soak_variancems, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
     AZ_CVAR(uint16_t, soak_losspercentage, 0, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality packet drop rate");
     AZ_CVAR(AZ::CVarFixedString, soak_serveraddr, AZ::CVarFixedString("127.0.0.1"), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The address of the server or host to connect to");
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
@@ -199,7 +199,7 @@ namespace NetSoakTest
                 unreliable.SetSmallDatum(2);
                 connection.SendUnreliablePacket(unreliable);
             }
-            
+
         };
 
         m_networkInterface->GetConnectionSet().VisitConnections(visitor);
@@ -259,7 +259,6 @@ namespace NetSoakTest
 
     void NetSoakTestSystemComponent::OnPacketLost([[maybe_unused]] IConnection* connection, [[maybe_unused]] PacketId packetId)
     {
-        ;
     }
 
     void NetSoakTestSystemComponent::OnDisconnect(IConnection* connection, [[maybe_unused]] DisconnectReason reason, [[maybe_unused]] AzNetworking::TerminationEndpoint endpoint)

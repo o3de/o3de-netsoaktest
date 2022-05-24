@@ -96,13 +96,15 @@ If you have a Git credential helper configured, you should not be prompted for y
 
 ## Running the Project
 
-Run the netsoak ServerLauncher with the relevant options (see below). It is strongly recommended to use --rhi=null when launching NetSoakTest.ServerLauncher
+Run the netsoak ServerLauncher with the relevant options (see below). It is strongly recommended to use --rhi=null when launching NetSoakTest.ServerLauncher when running test. 
 
 To pass command line values when launching the executable the format is ```--<command>=<value>```
 
 ``` 
 NetSoakTest.ServerLauncher --soak_mode=loopback --rhi=null 
 ```
+
+For experimentation with project, do not disable rhi so you can access the [debug console](https://www.o3de.org/docs/user-guide/appendix/cvars/debugging/#using-console-debug-views). The `DumpSoakStats` command can be used in the debug console to see point-in-time stats.
 
 Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTest does not utilize its GameLauncher by design.
 
@@ -118,6 +120,7 @@ Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTes
 | soak_port | The port that this soak test will bind to for game traffic | 33450 |
 | soak_protocol | Soak test protocol (TCP or UDP) | udp | 
 | soak_mode | The operating mode for the soak test, options are loopback, client or host. `Loopback` has two connection within the application feed traffic to each other in a loop. `Client` expects to connect to a server hosted at soak_serveraddr. `Host` hosts a server for clients to connect to | Loopback | 
+| DumpSoakStats | Dump snapshot of soak test networking stats to console | N/A|
 
 Other networking features such as Compression or DTLS/TLS can be enabled/disabled in the same way they would be in a production environment. For example:
 
