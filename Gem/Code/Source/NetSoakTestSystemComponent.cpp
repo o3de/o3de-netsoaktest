@@ -14,6 +14,9 @@
 
 #include "NetSoakTestSystemComponent.h"
 
+#include <AzFramework/API/ApplicationAPI.h>
+#include <AzFramework/Windowing/WindowBus.h>
+
 namespace AzNetworking
 {
     enum class SoakMode
@@ -100,6 +103,7 @@ namespace NetSoakTest
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
+    AZ_CVAR(AZ::TimeMs, soak_runtime, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run the soak test for before dumping stats");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -176,7 +180,18 @@ namespace NetSoakTest
 
     void NetSoakTestSystemComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
     {
-        [[maybe_unused]] auto elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+    	AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+
+        m_totalElapsedTime += elapsedMs;
+
+        // Check to test termination
+        if (soak_runtime != AZ::Time::ZeroTimeMs && m_totalElapsedTime > soak_runtime)
+        {
+            AZ::Interface<AZ::IConsole>::Get()->PerformCommand("DumpSoakStats");
+
+            AzFramework::ApplicationRequests::Bus::Broadcast(&AzFramework::ApplicationRequests::ExitMainLoop);
+            return;
+        }
 
         NetSoakTestPackets::Small packet;
 
@@ -199,7 +214,6 @@ namespace NetSoakTest
                 unreliable.SetSmallDatum(2);
                 connection.SendUnreliablePacket(unreliable);
             }
-
         };
 
         m_networkInterface->GetConnectionSet().VisitConnections(visitor);
