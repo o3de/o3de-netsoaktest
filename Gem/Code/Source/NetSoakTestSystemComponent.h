@@ -72,8 +72,10 @@ namespace NetSoakTest
         ////////////////////////////////////////////////////////////////////////
 
     private:
+        bool CheckforTimedTermination();
+
         AzNetworking::INetworkInterface* m_networkInterface = nullptr;
         AzNetworking::INetworkInterface* m_loopbackInterface = nullptr;
-        AZ::TimeMs m_totalElapsedTime = AZ::Time::ZeroTimeMs;
+        AZ::TimeMs m_soakEndTimepoint = AZ::Time::ZeroTimeMs;
     };
 }
