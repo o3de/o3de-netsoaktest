@@ -96,7 +96,7 @@ If you have a Git credential helper configured, you should not be prompted for y
 
 ## Running the Project
 
-Run the netsoak ServerLauncher with the relevant comand line values, using the format is ```--<command>=<value>```. See the full list of options below.
+Run the netsoak ServerLauncher with the relevant comand line values, using the nformat is ```--<command>=<value>```. See the full list of options below.
 
 For example, the following params will run the loopback test for 2 minutes before dumping stats and exiting:
 ``` 
@@ -119,7 +119,7 @@ Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTes
 | soak_port | The port that this soak test will bind to for game traffic | 33450 |
 | soak_protocol | Soak test protocol (TCP or UDP) | udp | 
 | soak_mode | The operating mode for the soak test, options are loopback, client or host. `Loopback` has two connection within the application feed traffic to each other in a loop. `Client` expects to connect to a server hosted at soak_serveraddr. `Host` hosts a server for clients to connect to | Loopback | 
-| soak_runtime | How long to run the test for. Will automatically dump stats at the end of the test period. | 0 (run indefinitely) |
+| soak_runtimems | How long to run the test for in milliseconds. Will automatically dump stats at the end of the test period. | 0 (run indefinitely) |
 | DumpSoakStats | Dump snapshot of soak test networking stats to console and log. | N/A |
 
 Other networking features such as Compression or DTLS/TLS can be enabled/disabled in the same way they would be in a production environment. For example:

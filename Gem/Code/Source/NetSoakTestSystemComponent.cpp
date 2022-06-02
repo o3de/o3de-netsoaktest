@@ -103,7 +103,7 @@ namespace NetSoakTest
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
-    AZ_CVAR(AZ::TimeMs, soak_runtime, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run the soak test for before dumping stats");
+    AZ_CVAR(AZ::TimeMs, soak_runtimems, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run (milliseconds) the soak test for before dumping stats. Defaults to running forever.");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -181,13 +181,13 @@ namespace NetSoakTest
     bool NetSoakTestSystemComponent::CheckforTimedTermination()
     {
         // Check to see if test should terminate early if running in timed mode
-        if (soak_runtime != AZ::Time::ZeroTimeMs)
+        if (soak_runtimems != AZ::Time::ZeroTimeMs)
         {
-            if (m_soakEndTimepoint == AZ::Time::ZeroTimeMs)
+            if (m_soakEndTimepointMs == AZ::Time::ZeroTimeMs)
             {
-                m_soakEndTimepoint = AZ::GetRealElapsedTimeMs() + soak_runtime;
+                m_soakEndTimepointMs = AZ::GetRealElapsedTimeMs() + soak_runtimems;
             }
-            else if (AZ::GetRealElapsedTimeMs() >= m_soakEndTimepoint)
+            else if (AZ::GetRealElapsedTimeMs() >= m_soakEndTimepointMs)
             {
                 return true;
             }
@@ -200,7 +200,7 @@ namespace NetSoakTest
     {
         if (CheckforTimedTermination())
         {
-            AZLOG_INFO("Completed timed run for %.2f seconds", AZ::TimeMsToSeconds(soak_runtime));
+            AZLOG_INFO("Completed timed run for %.2f seconds", AZ::TimeMsToSeconds(soak_runtimems));
             AZ::Interface<AZ::IConsole>::Get()->PerformCommand("DumpSoakStats");
 
             AzFramework::ApplicationRequests::Bus::Broadcast(&AzFramework::ApplicationRequests::ExitMainLoop);
