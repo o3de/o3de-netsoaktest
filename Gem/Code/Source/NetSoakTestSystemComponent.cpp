@@ -14,6 +14,9 @@
 
 #include "NetSoakTestSystemComponent.h"
 
+#include <AzFramework/API/ApplicationAPI.h>
+#include <AzFramework/Windowing/WindowBus.h>
+
 namespace AzNetworking
 {
     enum class SoakMode
@@ -100,6 +103,7 @@ namespace NetSoakTest
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
+    AZ_CVAR(AZ::TimeMs, soak_runtimems, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run (milliseconds) the soak test for before dumping stats. Defaults to running forever.");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
@@ -174,9 +178,34 @@ namespace NetSoakTest
         AZ::Interface<INetworking>::Get()->DestroyNetworkInterface(AZ::Name(s_networkInterfaceName));
     }
 
-    void NetSoakTestSystemComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    bool NetSoakTestSystemComponent::CheckforTimedTermination()
     {
-        [[maybe_unused]] auto elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+        // Check to see if test should terminate early if running in timed mode
+        if (soak_runtimems != AZ::Time::ZeroTimeMs)
+        {
+            if (m_soakEndTimepointMs == AZ::Time::ZeroTimeMs)
+            {
+                m_soakEndTimepointMs = AZ::GetRealElapsedTimeMs() + soak_runtimems;
+            }
+            else if (AZ::GetRealElapsedTimeMs() >= m_soakEndTimepointMs)
+            {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    void NetSoakTestSystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    {
+        if (CheckforTimedTermination())
+        {
+            AZLOG_INFO("Completed timed run for %.2f seconds", AZ::TimeMsToSeconds(soak_runtimems));
+            AZ::Interface<AZ::IConsole>::Get()->PerformCommand("DumpSoakStats");
+
+            AzFramework::ApplicationRequests::Bus::Broadcast(&AzFramework::ApplicationRequests::ExitMainLoop);
+            return;
+        }
 
         NetSoakTestPackets::Small packet;
 
@@ -199,7 +228,6 @@ namespace NetSoakTest
                 unreliable.SetSmallDatum(2);
                 connection.SendUnreliablePacket(unreliable);
             }
-
         };
 
         m_networkInterface->GetConnectionSet().VisitConnections(visitor);
