@@ -29,14 +29,12 @@ namespace AzNetworking
 
 namespace AZ::ConsoleTypeHelpers
 {
-    template <>
     inline CVarFixedString ValueToString(const AzNetworking::ProtocolType& value)
     {
         return (value == AzNetworking::ProtocolType::Tcp) ? "tcp" : "udp";
     }
 
-    template <>
-    inline bool StringSetToValue<AzNetworking::ProtocolType>(AzNetworking::ProtocolType& outValue, const ConsoleCommandContainer& arguments)
+    inline bool StringSetToValue(AzNetworking::ProtocolType& outValue, const ConsoleCommandContainer& arguments)
     {
         if (!arguments.empty())
         {
@@ -54,7 +52,6 @@ namespace AZ::ConsoleTypeHelpers
         return false;
     }
 
-    template <>
     inline CVarFixedString ValueToString(const AzNetworking::SoakMode& value)
     {
         if (value == AzNetworking::SoakMode::Client)
@@ -68,8 +65,7 @@ namespace AZ::ConsoleTypeHelpers
         return "loopback";
     }
 
-    template <>
-    inline bool StringSetToValue<AzNetworking::SoakMode>(AzNetworking::SoakMode& outValue, const ConsoleCommandContainer& arguments)
+    inline bool StringSetToValue(AzNetworking::SoakMode& outValue, const ConsoleCommandContainer& arguments)
     {
         if (!arguments.empty())
         {
