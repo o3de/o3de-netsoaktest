@@ -20,11 +20,12 @@ endfunction()
 
 if(NOT PROJECT_NAME)
     cmake_minimum_required(VERSION 3.19)
+    include(cmake/CompilerSettings.cmake)
     project(NetSoakTest
         LANGUAGES C CXX
         VERSION 1.0.0.0
     )
-    include(EngineFinder.cmake OPTIONAL)
+    include(cmake/EngineFinder.cmake OPTIONAL)
     find_package(o3de REQUIRED)
     o3de_initialize()
     add_vs_debugger_arguments()

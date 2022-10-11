@@ -4,13 +4,5 @@
     "executable_name": "NetSoakTestLauncher",
     "modules": [],
     "project_id": "{5F3363D3-4A7C-47A6-B464-B21524771358}",
-    "android_settings": {
-        "package_name": "com.lumberyard.yourgame",
-        "version_number": 1,
-        "version_name": "1.0.0.0",
-        "orientation": "landscape"
-    },
-    "xenia_settings": {},
-    "provo_settings": {},
     "engine": "o3de"
 }

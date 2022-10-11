@@ -14,6 +14,9 @@
 
 #include "NetSoakTestSystemComponent.h"
 
+#include <AzFramework/API/ApplicationAPI.h>
+#include <AzFramework/Windowing/WindowBus.h>
+
 namespace AzNetworking
 {
     enum class SoakMode
@@ -26,14 +29,12 @@ namespace AzNetworking
 
 namespace AZ::ConsoleTypeHelpers
 {
-    template <>
     inline CVarFixedString ValueToString(const AzNetworking::ProtocolType& value)
     {
         return (value == AzNetworking::ProtocolType::Tcp) ? "tcp" : "udp";
     }
 
-    template <>
-    inline bool StringSetToValue<AzNetworking::ProtocolType>(AzNetworking::ProtocolType& outValue, const ConsoleCommandContainer& arguments)
+    inline bool StringSetToValue(AzNetworking::ProtocolType& outValue, const ConsoleCommandContainer& arguments)
     {
         if (!arguments.empty())
         {
@@ -51,7 +52,6 @@ namespace AZ::ConsoleTypeHelpers
         return false;
     }
 
-    template <>
     inline CVarFixedString ValueToString(const AzNetworking::SoakMode& value)
     {
         if (value == AzNetworking::SoakMode::Client)
@@ -65,8 +65,7 @@ namespace AZ::ConsoleTypeHelpers
         return "loopback";
     }
 
-    template <>
-    inline bool StringSetToValue<AzNetworking::SoakMode>(AzNetworking::SoakMode& outValue, const ConsoleCommandContainer& arguments)
+    inline bool StringSetToValue(AzNetworking::SoakMode& outValue, const ConsoleCommandContainer& arguments)
     {
         if (!arguments.empty())
         {
@@ -93,17 +92,18 @@ namespace NetSoakTest
     static const AZStd::string_view s_networkInterfaceName("NetSoakNetworkInterface");
     static const AZStd::string_view s_loopbackInterfaceName("NetSoakLoopbackInterface");
 
-    AZ_CVAR(AZ::TimeMs, soak_latencyms, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality latency");
-    AZ_CVAR(AZ::TimeMs, soak_variancems, AZ::TimeMs(0), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
+    AZ_CVAR(AZ::TimeMs, soak_latencyms, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality latency");
+    AZ_CVAR(AZ::TimeMs, soak_variancems, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality variance");
     AZ_CVAR(uint16_t, soak_losspercentage, 0, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Simulated connection quality packet drop rate");
     AZ_CVAR(AZ::CVarFixedString, soak_serveraddr, AZ::CVarFixedString("127.0.0.1"), nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The address of the server or host to connect to");
     AZ_CVAR(uint16_t, soak_port, 33450, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "The port that this soak test will bind to for game traffic");
     AZ_CVAR(ProtocolType, soak_protocol, ProtocolType::Udp, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test protocol");
     AZ_CVAR(SoakMode, soak_mode, SoakMode::Loopback, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "Soak test mode");
+    AZ_CVAR(AZ::TimeMs, soak_runtimems, AZ::Time::ZeroTimeMs, nullptr, AZ::ConsoleFunctorFlags::DontReplicate, "How long to run (milliseconds) the soak test for before dumping stats. Defaults to running forever.");
 
     void NetSoakTestSystemComponent::Reflect(AZ::ReflectContext* context)
     {
-        if (AZ::SerializeContext* serialize = azrtti_cast<AZ::SerializeContext*>(context))
+        if (auto serialize = azrtti_cast<AZ::SerializeContext*>(context))
         {
             serialize->Class<NetSoakTestSystemComponent, AZ::Component>()
                 ->Version(0)
@@ -169,11 +169,39 @@ namespace NetSoakTest
     {
         AZ::TickBus::Handler::BusDisconnect();
         NetSoakTestRequestBus::Handler::BusDisconnect();
+
+        AZ::Interface<INetworking>::Get()->DestroyNetworkInterface(AZ::Name(s_loopbackInterfaceName));
+        AZ::Interface<INetworking>::Get()->DestroyNetworkInterface(AZ::Name(s_networkInterfaceName));
     }
 
-    void NetSoakTestSystemComponent::OnTick(float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    bool NetSoakTestSystemComponent::CheckforTimedTermination()
     {
-        [[maybe_unused]] AZ::TimeMs elapsedMs = aznumeric_cast<AZ::TimeMs>(aznumeric_cast<int64_t>(deltaTime / 1000.0f));
+        // Check to see if test should terminate early if running in timed mode
+        if (soak_runtimems != AZ::Time::ZeroTimeMs)
+        {
+            if (m_soakEndTimepointMs == AZ::Time::ZeroTimeMs)
+            {
+                m_soakEndTimepointMs = AZ::GetRealElapsedTimeMs() + soak_runtimems;
+            }
+            else if (AZ::GetRealElapsedTimeMs() >= m_soakEndTimepointMs)
+            {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    void NetSoakTestSystemComponent::OnTick([[maybe_unused]] float deltaTime, [[maybe_unused]] AZ::ScriptTimePoint time)
+    {
+        if (CheckforTimedTermination())
+        {
+            AZLOG_INFO("Completed timed run for %.2f seconds", AZ::TimeMsToSeconds(soak_runtimems));
+            AZ::Interface<AZ::IConsole>::Get()->PerformCommand("DumpSoakStats");
+
+            AzFramework::ApplicationRequests::Bus::Broadcast(&AzFramework::ApplicationRequests::ExitMainLoop);
+            return;
+        }
 
         NetSoakTestPackets::Small packet;
 
@@ -181,11 +209,11 @@ namespace NetSoakTest
         {
             connection.SendReliablePacket(packet);
 
-            uint32_t rand_int = rand();
+            const uint32_t rand_int = rand();
             if (rand_int % 10 == 1)
             {
                 NetSoakTest::TestNetworkBuffer buffer = NetSoakTest::TestNetworkBuffer(NetSoakTest::MassiveBuffer);
-                NetSoakTestPackets::Large* large = new NetSoakTestPackets::Large(buffer);
+                const NetSoakTestPackets::Large* large = new NetSoakTestPackets::Large(buffer);
                 connection.SendReliablePacket(*large);
                 delete large;
             }
@@ -196,7 +224,6 @@ namespace NetSoakTest
                 unreliable.SetSmallDatum(2);
                 connection.SendUnreliablePacket(unreliable);
             }
-            
         };
 
         m_networkInterface->GetConnectionSet().VisitConnections(visitor);
@@ -256,7 +283,6 @@ namespace NetSoakTest
 
     void NetSoakTestSystemComponent::OnPacketLost([[maybe_unused]] IConnection* connection, [[maybe_unused]] PacketId packetId)
     {
-        ;
     }
 
     void NetSoakTestSystemComponent::OnDisconnect(IConnection* connection, [[maybe_unused]] DisconnectReason reason, [[maybe_unused]] AzNetworking::TerminationEndpoint endpoint)
@@ -270,7 +296,7 @@ namespace NetSoakTest
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_networkInterfaceName)));
         networkInterfaces.push_back(AZ::Interface<INetworking>::Get()->RetrieveNetworkInterface(AZ::Name(s_loopbackInterfaceName)));
 
-        for (auto& networkInterface : networkInterfaces)
+        for (const auto& networkInterface : networkInterfaces)
         {
             const char* protocol = networkInterface->GetType() == ProtocolType::Tcp ? "Tcp" : "Udp";
             const char* trustZone = networkInterface->GetTrustZone() == TrustZone::ExternalClientToServer ? "ExternalClientToServer" : "InternalServerToServer";

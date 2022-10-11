@@ -96,13 +96,14 @@ If you have a Git credential helper configured, you should not be prompted for y
 
 ## Running the Project
 
-Run the netsoak ServerLauncher with the relevant options (see below). It is strongly recommended to use --rhi=null when launching NetSoakTest.ServerLauncher
+Run the netsoak ServerLauncher with the relevant comand line values, using the nformat is ```--<command>=<value>```. See the full list of options below.
 
-To pass command line values when launching the executable the format is ```--<command>=<value>```
-
+For example, the following params will run the loopback test for 2 minutes before dumping stats and exiting:
 ``` 
-NetSoakTest.ServerLauncher --soak_mode=loopback --rhi=null 
+NetSoakTest.ServerLauncher --soak_mode=loopback --soak_runtime=2000
 ```
+
+When running tests, you can use the [debug console](https://www.o3de.org/docs/user-guide/appendix/cvars/debugging/#using-console-debug-views) and the `DumpSoakStats` command to see point-in-time stats from the test. The test will run indefinitely unless `soak_runtime` is set.
 
 Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTest does not utilize its GameLauncher by design.
 
@@ -118,6 +119,8 @@ Note: All O3DE projects generate a GameLauncher and a ServerLauncher. NetSoakTes
 | soak_port | The port that this soak test will bind to for game traffic | 33450 |
 | soak_protocol | Soak test protocol (TCP or UDP) | udp | 
 | soak_mode | The operating mode for the soak test, options are loopback, client or host. `Loopback` has two connection within the application feed traffic to each other in a loop. `Client` expects to connect to a server hosted at soak_serveraddr. `Host` hosts a server for clients to connect to | Loopback | 
+| soak_runtimems | How long to run the test for in milliseconds. Will automatically dump stats at the end of the test period. | 0 (run indefinitely) |
+| DumpSoakStats | Dump snapshot of soak test networking stats to console and log. | N/A |
 
 Other networking features such as Compression or DTLS/TLS can be enabled/disabled in the same way they would be in a production environment. For example:
 
