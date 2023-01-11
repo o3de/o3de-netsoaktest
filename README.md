@@ -62,7 +62,7 @@ Cloning into 'o3de-netsoaktest'...
 > /path/to/o3de/scripts/o3de.sh register -p /path/to/o3de-netsoaktest
 
 # example configure command
-> cmake -S /pathto/o3de-netsoaktest -B /path/to/o3de-netsoaktest/build -G "Ninja Multi-Config" -DLY_3RDPARTY_PATH="C:/3rdparty" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 
+> cmake -S /path/to/o3de-netsoaktest -B /path/to/o3de-netsoaktest/build -G "Ninja Multi-Config" -DLY_3RDPARTY_PATH="/home/user/3rdparty" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 
 
 # example build command
 > cmake --build /path/to/o3de-netsoaktest/build --config profile --target Editor NetSoakTest.ServerLauncher
