@@ -52,6 +52,7 @@ ly_add_target(
 # if enabled, NetSoakTest is used by all kinds of applications
 ly_create_alias(NAME NetSoakTest.Clients  NAMESPACE Gem TARGETS Gem::NetSoakTest)
 ly_create_alias(NAME NetSoakTest.Servers  NAMESPACE Gem TARGETS Gem::NetSoakTest)
+ly_create_alias(NAME NetSoakTest.Unified  NAMESPACE Gem TARGETS Gem::NetSoakTest)
 
 ################################################################################
 # Gem dependencies
