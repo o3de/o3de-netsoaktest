@@ -43,10 +43,10 @@ Cloning into 'o3de-netsoaktest'...
 > C:/Path/To/o3de/scripts/o3de.bat register -p C:/Path/To/o3de-netsoaktest
 
 # example configure command
-> cmake -S C:/Path/To/o3de-netsoaktest -b C:/Path/To/o3de-netsoaktest/build -G "Visual Studio 16 2019" -DLY_3RDPARTY_PATH="C:/3rdparty"
+> cmake -S C:/Path/To/o3de-netsoaktest -B C:/Path/To/o3de-netsoaktest/build/windows_vs2019 -G "Visual Studio 16" -DLY_3RDPARTY_PATH="C:/3rdParty"
 
 # example build command
-> cmake --build C:/Path/To/o3de-netsoaktest/build --target Editor NetSoakTest.ServerLauncher --configure profile -- /m /nologo 
+> cmake --build C:/Path/To/o3de-netsoaktest/build/windows_vs2019 --target Editor NetSoakTest.ServerLauncher --config profile -- /m /nologo 
 ```
 
 ##### Linux
@@ -62,7 +62,7 @@ Cloning into 'o3de-netsoaktest'...
 > /path/to/o3de/scripts/o3de.sh register -p /path/to/o3de-netsoaktest
 
 # example configure command
-> cmake -S /pathto/o3de-netsoaktest -b /path/to/o3de-netsoaktest/build -G "Ninja Multi-Config" -DLY_3RDPARTY_PATH="C:/3rdparty" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 
+> cmake -S /path/to/o3de-netsoaktest -B /path/to/o3de-netsoaktest/build -G "Ninja Multi-Config" -DLY_3RDPARTY_PATH="/home/user/3rdparty" -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 
 
 # example build command
 > cmake --build /path/to/o3de-netsoaktest/build --config profile --target Editor NetSoakTest.ServerLauncher
